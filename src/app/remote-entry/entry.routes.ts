@@ -4,9 +4,9 @@ import { hubPermissionGuard } from '@daruix/hub-auth';
 import { OpenedBuyOrderService } from '../opened-buy-order.service';
 
 export const ORDENS_COMPRA_ROUTES: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'lista' },
+  { path: '', pathMatch: 'full', redirectTo: 'ordens-compra' },
   {
-    path: 'lista',
+    path: 'ordens-compra',
     canActivate: [hubPermissionGuard],
     data: { permission: 'po.ver' },
     // A API Flask original usa um cliente HTTP próprio, sem os interceptors do BFF.
