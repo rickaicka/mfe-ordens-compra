@@ -1,0 +1,15 @@
+<main class="orders-page">
+  <header>
+    <h1>Ordens de compra</h1>
+    <button type="button" (click)="atualizar()" [disabled]="loading()">Atualizar</button>
+  </header>
+  <section class="orders-status" aria-live="polite" [attr.aria-busy]="loading()">
+    @if (loading()) {
+      <p>Consultando ordens de compra...</p>
+    } @else if (error()) {
+      <p role="alert">Não foi possível consultar as ordens de compra. Tente novamente.</p>
+    } @else if (loaded()) {
+      <p>Consulta concluída.</p>
+    }
+  </section>
+</main>

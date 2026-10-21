@@ -1,0 +1,6 @@
+{
+  "remessas": "./remotes/remessas/remoteEntry.json",
+  "obras": "./remotes/obras/remoteEntry.json",
+  "gestao-administrativa": "./remotes/cadastros/remoteEntry.json",
+  "ordens-compra": "./remotes/ordens-compra/remoteEntry.json"
+}

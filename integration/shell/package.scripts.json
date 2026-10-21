@@ -1,0 +1,5 @@
+{
+  "start:mfe:ordens-compra": "npm --prefix ../mfe-daruix-ordens-compra start",
+  "build:mfe:ordens-compra": "npm --prefix ../mfe-daruix-ordens-compra run build",
+  "sync:mfe:ordens-compra": "node -e \"const fs=require('node:fs');const source='../mfe-daruix-ordens-compra/dist/mfe-daruix-ordens-compra';const target='public/remotes/ordens-compra';if(!fs.existsSync(source))throw new Error('Build do MFE nao encontrado: '+source);fs.rmSync(target,{recursive:true,force:true});fs.mkdirSync(target,{recursive:true});fs.cpSync(source,target,{recursive:true});\""
+}

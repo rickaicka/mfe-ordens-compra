@@ -1,0 +1,7 @@
+services:
+  ordens-compra:
+    image: ghcr.io/rickaicka/mfe-ordens-compra:latest
+    container_name: daruix-hub-ordens-compra
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:4305:80"
