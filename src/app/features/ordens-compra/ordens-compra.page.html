@@ -1,15 +1,206 @@
-<main class="orders-page">
-  <header>
-    <h1>Ordens de compra</h1>
-    <button type="button" (click)="atualizar()" [disabled]="loading()">Atualizar</button>
+<section class="orders-page">
+  <header class="orders-page__header">
+    <div class="orders-page__heading">
+      <p class="drx-font-gothic-subtitle-sm bolder-font">Ordens de Compra em Aberto</p>
+      <p class="drx-font-quicksand-body-sm">Consulte os pedidos pendentes e acesse o PDF de cada ordem de compra.</p>
+    </div>
+
+    <button
+      type="button"
+      class="orders-button orders-button--tertiary"
+      (click)="atualizar()"
+      [disabled]="loading()"
+    >
+      <app-hub-icon [name]="'refresh-ccw'"></app-hub-icon>
+      {{ loading() ? 'Atualizando...' : 'Atualizar' }}
+    </button>
   </header>
-  <section class="orders-status" aria-live="polite" [attr.aria-busy]="loading()">
-    @if (loading()) {
-      <p>Consultando ordens de compra...</p>
-    } @else if (error()) {
-      <p role="alert">Não foi possível consultar as ordens de compra. Tente novamente.</p>
-    } @else if (loaded()) {
-      <p>Consulta concluída.</p>
+
+  @if (loading()) {
+    <div class="orders-loading" role="status" aria-live="polite">
+      <ion-progress-bar type="indeterminate" aria-label="Carregando ordens de compra" />
+      <span>Carregando ordens de compra...</span>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="orders-feedback orders-feedback--error" role="alert">
+      <div>
+        <strong>Não foi possível carregar as ordens.</strong>
+        <span>{{ error() }}</span>
+      </div>
+      <button type="button" class="orders-feedback__action" (click)="atualizar()">
+        Tentar novamente
+      </button>
+    </div>
+  }
+
+  @if (pdfError()) {
+    <div class="orders-feedback orders-feedback--error" role="alert">
+      <div>
+        <strong>Não foi possível abrir o documento.</strong>
+        <span>{{ pdfError() }}</span>
+      </div>
+      <button type="button" class="orders-feedback__close" aria-label="Fechar aviso" (click)="clearPdfError()">
+        ×
+      </button>
+    </div>
+  }
+
+  <section class="orders-panel orders-filter" aria-labelledby="orders-filter-title">
+    <header class="orders-panel__header">
+      <div>
+        <p>Refine a lista por PC ou pela data prevista de entrega.</p>
+      </div>
+
+      @if (hasActiveFilter()) {
+        <button type="button" class="orders-link-button" (click)="clearFilters()">
+          Limpar filtros
+        </button>
+      }
+    </header>
+
+    <div class="orders-filter__body">
+      <span class="orders-field-label">Filtrar por</span>
+
+      <ion-radio-group
+        class="orders-filter__types"
+        [value]="filterType()"
+        [allowEmptySelection]="true"
+        (ionChange)="handleChangeType($event)"
+      >
+        <ion-radio value="type_pc" labelPlacement="end">PC</ion-radio>
+        <ion-radio value="type_date" labelPlacement="end">Data de entrega</ion-radio>
+      </ion-radio-group>
+
+      @if (filterType()) {
+        <ion-item class="orders-filter__select" lines="none">
+          <ion-select
+            interface="popover"
+            [interfaceOptions]="{ cssClass: 'oc-select-popover' }"
+            [label]="filterType() === 'type_pc' ? 'PC' : 'Data de entrega'"
+            label-placement="stacked"
+            [placeholder]="filterType() === 'type_pc' ? 'Selecione o PC' : 'Selecione a data'"
+            [value]="selectedFilterValue()"
+            (ionChange)="handleChange($event)"
+          >
+            <ion-select-option value="">Todos</ion-select-option>
+            @for (option of activeFilterOptions(); track option) {
+              <ion-select-option [value]="option">{{ option }}</ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
+      }
+    </div>
+  </section>
+
+  <section class="orders-results" aria-labelledby="orders-results-title">
+    <header class="orders-results__header">
+      <div>
+        <span class="orders-panel__eyebrow">Resultado</span>
+        <h2 id="orders-results-title">Ordens encontradas</h2>
+      </div>
+
+      <span class="orders-results__count" aria-live="polite">
+        {{ openedOrders().length }}
+        {{ openedOrders().length === 1 ? 'ordem' : 'ordens' }}
+      </span>
+    </header>
+
+    @if (loaded() && openedOrders().length === 0) {
+      <div class="orders-empty-state" role="status">
+        <span class="orders-empty-state__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M6 3h12v18H6z" />
+            <path d="M9 7h6M9 11h6M9 15h4" />
+          </svg>
+        </span>
+        <strong>Nenhuma ordem de compra encontrada.</strong>
+        <span>
+          {{ hasActiveFilter() ? 'Tente outro filtro ou limpe a seleção atual.' : 'Não há ordens em aberto para exibir no momento.' }}
+        </span>
+
+        @if (hasActiveFilter()) {
+          <button type="button" class="orders-button orders-button--secondary" (click)="clearFilters()">
+            Limpar filtros
+          </button>
+        }
+      </div>
+    } @else {
+      <ion-list class="orders-list">
+        <ion-accordion-group class="orders-accordion">
+          @for (order of openedOrders(); track orderKey(order)) {
+            <ion-accordion [value]="orderKey(order)" class="orders-accordion__item">
+              <ion-item slot="header" lines="none" class="orders-accordion__header">
+                <ion-card class="order-card">
+                  <ion-card-header>
+                    <div class="order-card__topline">
+                      <div>
+                        <span class="order-card__label">Ordem de compra</span>
+                        <strong class="order-card__number">OC nº {{ order.cod }}</strong>
+                      </div>
+
+                      <span class="order-status" [ngClass]="order.classStatus">
+                        {{ order.status }}
+                      </span>
+                    </div>
+
+                    <div class="order-card__meta">
+                      <div>
+                        <span>PC</span>
+                        <strong>{{ order.pc_number || '—' }}</strong>
+                      </div>
+                      <div>
+                        <span>Entrega</span>
+                        <strong>{{ order.dt_delivery || '—' }}</strong>
+                      </div>
+                    </div>
+
+                    <div class="order-card__content">
+                      <p>
+                        <span>Fornecedor</span>
+                        <strong>{{ order.supplier || '—' }}</strong>
+                      </p>
+                      <p>
+                        <span>Descrição</span>
+                        <strong>{{ order.description || '—' }}</strong>
+                      </p>
+                    </div>
+                  </ion-card-header>
+                </ion-card>
+              </ion-item>
+
+              <div slot="content" class="order-details">
+                <div class="order-details__grid">
+                  <div>
+                    <span>Data da compra</span>
+                    <strong>{{ order.dt_solicitation || '—' }}</strong>
+                  </div>
+                  <div>
+                    <span>Valor da OC</span>
+                    <strong>{{ formatValue(order.buy_order_value) }}</strong>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  class="orders-button orders-button--primary orders-button--full"
+                  (click)="downloadOC(order)"
+                  [disabled]="downloading() !== null"
+                  [attr.aria-label]="'Abrir PDF da OC ' + order.cod"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 3v12" />
+                    <path d="m7 10 5 5 5-5" />
+                    <path d="M5 21h14" />
+                  </svg>
+                  {{ isDownloading(order) ? 'Preparando PDF...' : 'Abrir PDF da OC' }}
+                </button>
+              </div>
+            </ion-accordion>
+          }
+        </ion-accordion-group>
+      </ion-list>
     }
   </section>
-</main>
+</section>

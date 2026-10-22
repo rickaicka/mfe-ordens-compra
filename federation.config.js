@@ -7,6 +7,6 @@ module.exports = withNativeFederation({
     ...shareAll({ singleton: true, strictVersion: true, requiredVersion: 'auto' }),
     '@daruix/hub-auth': { singleton: true, strictVersion: true, requiredVersion: 'auto' },
   },
-  skip: ['rxjs/ajax', 'rxjs/fetch', 'rxjs/testing', 'rxjs/webSocket'],
+  skip: [/^@ionic\/core(?:\/|$)/, /^ionicons(?:\/|$)/, 'rxjs/ajax', 'rxjs/fetch', 'rxjs/testing', 'rxjs/webSocket'],
   features: { ignoreUnusedDeps: true },
 });

@@ -118,7 +118,8 @@
           "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "tsconfig.spec.json",
-            "buildTarget": "mfe-daruix-ordens-compra:esbuild:development"
+            "buildTarget": "mfe-daruix-ordens-compra:esbuild:development",
+            "runnerConfig": "vitest.config.ts"
           }
         }
       }
