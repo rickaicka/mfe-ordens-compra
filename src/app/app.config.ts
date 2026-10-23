@@ -12,6 +12,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideIonicAngular(),
     provideHttpClient(withFetch()),
-    { provide: HUB_AUTH_API_URL, useValue: environment.hubApiUrl },
+    { provide: HUB_AUTH_API_URL, useValue: environment.apiUrl },
   ],
 };
