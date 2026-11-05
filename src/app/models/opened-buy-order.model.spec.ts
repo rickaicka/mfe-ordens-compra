@@ -7,4 +7,16 @@ describe('Normalização das ordens', () => {
     expect(result.status).toBe(label); expect(result.classStatus).toBe(css);
     expect(result.pc_number).toBe('12'); expect(result.cod).toBe('34');
   });
+
+  it.each([
+    ['Encerrado', 'Encerrado', 'status-unknown'],
+    ['Concluído', 'Concluído', 'status-unknown'],
+    [' Entregue ', 'Entregue', 'status-delivered'],
+    [null, 'Não informado', 'status-unknown'],
+    ['', 'Não informado', 'status-unknown'],
+  ] as const)('prioriza o status do BFF %s', (statusLabel, label, css) => {
+    const result = normalizeOrder({ ...raw, status: '0;Em Andamento;1;Não', status_label: statusLabel });
+    expect(result.status).toBe(label);
+    expect(result.classStatus).toBe(css);
+  });
 });

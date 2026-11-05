@@ -7,6 +7,7 @@ export interface OpenedBuyOrderRaw {
   supplier: string | null;
   description: string | null;
   status: string | number | null;
+  status_label?: string | null;
 }
 
 export interface OpenedBuyOrder extends Omit<OpenedBuyOrderRaw, 'pc_number' | 'cod' | 'status'> {
@@ -24,7 +25,9 @@ export interface OrdersApiResponse {
 }
 
 export function normalizeOrder(order: OpenedBuyOrderRaw): OpenedBuyOrder {
-  const status = String(order.status ?? '').split(';')[0].trim();
+  const status = order.status_label === undefined
+    ? String(order.status ?? '').split(';', 1)[0].trim()
+    : (order.status_label ?? '').trim();
   const states: Record<string, [string, string]> = {
     '0': ['Em Andamento', 'status-opened'],
     '1': ['Não Entregue', 'status-undelivered'],
@@ -33,6 +36,8 @@ export function normalizeOrder(order: OpenedBuyOrderRaw): OpenedBuyOrder {
     'Não Entregue': ['Não Entregue', 'status-undelivered'],
     'Entregue': ['Entregue', 'status-delivered'],
   };
-  const [label, classStatus] = states[status] ?? [status || 'Não informado', 'status-unknown'];
+  const [label, classStatus] = Object.prototype.hasOwnProperty.call(states, status)
+    ? states[status]
+    : [status || 'Não informado', 'status-unknown'];
   return { ...order, pc_number: String(order.pc_number ?? ''), cod: String(order.cod ?? ''), status: label, classStatus };
 }
