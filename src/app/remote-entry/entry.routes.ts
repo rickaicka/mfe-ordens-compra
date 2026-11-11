@@ -8,8 +8,7 @@ export const ORDENS_COMPRA_ROUTES: Routes = [
   {
     path: 'ordens-compra',
     canActivate: [hubPermissionGuard],
-    data: { permission: 'po.ver' },
-    // A API Flask original usa um cliente HTTP próprio, sem os interceptors do BFF.
+    data: { permission: 'opened_order.view' },
     providers: [provideHttpClient(withFetch()), OpenedBuyOrderService],
     loadComponent: () => import('../features/ordens-compra/ordens-compra.page').then((m) => m.OrdensCompraPage),
   },
