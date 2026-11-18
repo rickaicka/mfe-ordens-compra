@@ -8,6 +8,9 @@ export interface OpenedBuyOrderRaw {
   description: string | null;
   status: string | number | null;
   status_label?: string | null;
+  source?: 'legacy' | 'hub';
+  code?: string;
+  pdf_available?: boolean;
 }
 
 export interface OpenedBuyOrder extends Omit<OpenedBuyOrderRaw, 'pc_number' | 'cod' | 'status'> {
@@ -35,6 +38,7 @@ export function normalizeOrder(order: OpenedBuyOrderRaw): OpenedBuyOrder {
     'Em Andamento': ['Em Andamento', 'status-opened'],
     'Não Entregue': ['Não Entregue', 'status-undelivered'],
     'Entregue': ['Entregue', 'status-delivered'],
+    'Gerada': ['Gerada', 'status-unknown'],
   };
   const [label, classStatus] = Object.prototype.hasOwnProperty.call(states, status)
     ? states[status]

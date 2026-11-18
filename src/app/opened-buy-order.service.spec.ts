@@ -14,10 +14,10 @@ describe('OpenedBuyOrderService', () => {
     http = TestBed.inject(HttpTestingController);
   });
   afterEach(() => http.verify());
-  it('usa a URL configurada e preserva o endpoint Flask', () => {
+  it('consulta a API unificada autenticada no Django', () => {
     let result: unknown;
     service.getOpenedBuyOrders().subscribe((value) => result = value);
-    const request = http.expectOne('/ordens-compra-api/opened-buy-order');
+    const request = http.expectOne('/api/quotation-maps/opened-purchase-orders/');
     expect(request.request.method).toBe('GET');
     request.flush([{ id: 1 }]);
     expect(result).toEqual([{ id: 1 }]);
@@ -25,13 +25,13 @@ describe('OpenedBuyOrderService', () => {
   it('desembrulha data da resposta Flask', () => {
     let result: unknown;
     service.getOpenedBuyOrders().subscribe(value => result = value);
-    http.expectOne('/ordens-compra-api/opened-buy-order').flush({ status: 'success', data: [{ pc_number: '123', cod: '456' }], pagination: { total: 1, page: 1, per_page: 100 } });
+    http.expectOne('/api/quotation-maps/opened-purchase-orders/').flush({ status: 'success', data: [{ pc_number: '123', cod: '456' }], pagination: { total: 1, page: 1, per_page: 100 } });
     expect(result).toEqual([{ pc_number: '123', cod: '456' }]);
   });
   it('reporta erro declarado pela API', () => {
     let error: Error | undefined;
     service.getOpenedBuyOrders().subscribe({ error: value => error = value });
-    http.expectOne('/ordens-compra-api/opened-buy-order').flush({ status: 'error', message: 'Falha no banco', data: [] });
+    http.expectOne('/api/quotation-maps/opened-purchase-orders/').flush({ status: 'error', message: 'Falha no banco', data: [] });
     expect(error?.message).toBe('Falha no banco');
   });
   it('solicita PDF como blob e codifica os identificadores', () => {

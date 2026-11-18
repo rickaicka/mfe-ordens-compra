@@ -1,4 +1,4 @@
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import {provideHttpClient, withFetch, withRequestsMadeViaParent} from '@angular/common/http';
 import { Routes } from '@angular/router';
 import { hubPermissionGuard } from '@daruix/hub-auth';
 import { OpenedBuyOrderService } from '../opened-buy-order.service';
@@ -9,7 +9,10 @@ export const ORDENS_COMPRA_ROUTES: Routes = [
     path: 'ordens-compra',
     canActivate: [hubPermissionGuard],
     data: { permission: 'opened_order.view' },
-    providers: [provideHttpClient(withFetch()), OpenedBuyOrderService],
+    providers: [
+      provideHttpClient(withRequestsMadeViaParent()),
+      OpenedBuyOrderService
+    ],
     loadComponent: () => import('../features/ordens-compra/ordens-compra.page').then((m) => m.OrdensCompraPage),
   },
 ];

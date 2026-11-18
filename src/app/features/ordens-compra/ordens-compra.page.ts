@@ -179,7 +179,7 @@ export class OrdensCompraPage {
   }
 
   orderKey(order: OpenedBuyOrder): string {
-    return `${order.pc_number}/${order.cod}`;
+    return `${order.source ?? 'legacy'}/${order.pc_number}/${order.cod}`;
   }
 
   isDownloading(order: OpenedBuyOrder): boolean {
@@ -198,6 +198,10 @@ export class OrdensCompraPage {
   }
 
   downloadOC(order: OpenedBuyOrder): void {
+    if (order.source === 'hub' || order.pdf_available === false) {
+      this.pdfError.set('O PDF desta OC gerada pelo Hub ainda não está disponível.');
+      return;
+    }
     if (this.downloading()) return;
 
     this.pdfError.set('');

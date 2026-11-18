@@ -136,8 +136,8 @@
                   <ion-card-header>
                     <div class="order-card__topline">
                       <div>
-                        <span class="order-card__label">Ordem de compra</span>
-                        <strong class="order-card__number">OC nº {{ order.cod }}</strong>
+                        <span class="order-card__label">Ordem de compra · {{ order.source === 'hub' ? 'Hub' : 'Legado' }}</span>
+                        <strong class="order-card__number">OC nº {{ order.code || order.cod }}</strong>
                       </div>
 
                       <span class="order-status" [ngClass]="order.classStatus">
@@ -186,7 +186,7 @@
                   type="button"
                   class="orders-button orders-button--primary orders-button--full"
                   (click)="downloadOC(order)"
-                  [disabled]="downloading() !== null"
+                  [disabled]="downloading() !== null || order.source === 'hub' || order.pdf_available === false"
                   [attr.aria-label]="'Abrir PDF da OC ' + order.cod"
                 >
                   <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -194,7 +194,7 @@
                     <path d="m7 10 5 5 5-5" />
                     <path d="M5 21h14" />
                   </svg>
-                  {{ isDownloading(order) ? 'Preparando PDF...' : 'Abrir PDF da OC' }}
+                  {{ order.source === 'hub' ? 'PDF ainda indisponível' : (isDownloading(order) ? 'Preparando PDF...' : 'Abrir PDF da OC') }}
                 </button>
               </div>
             </ion-accordion>

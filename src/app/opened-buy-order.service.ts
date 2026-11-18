@@ -14,7 +14,7 @@ export class OpenedBuyOrderService {
   private readonly apiUrl = inject(ORDENS_COMPRA_API_URL).replace(/\/+$/, '');
 
   getOpenedBuyOrders(): Observable<OpenedBuyOrderRaw[]> {
-    return this.httpClient.get<OrdersApiResponse | OpenedBuyOrderRaw[]>(`${this.apiUrl}/opened-buy-order`).pipe(
+    return this.httpClient.get<OrdersApiResponse | OpenedBuyOrderRaw[]>('/api/quotation-maps/opened-purchase-orders/').pipe(
       map((response) => {
         if (Array.isArray(response)) return response;
         if (response.status === 'error') throw new Error(response.message || 'Não foi possível consultar as ordens.');
